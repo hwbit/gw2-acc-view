@@ -1,26 +1,26 @@
 
 
-import { writeToFile } from "../util/fileWrite"
-import { createReqDetails } from "../util/api"
-import { Request, Response } from 'express'
+import { writeToFile } from "../util/fileWrite";
+import { createReqDetails } from "../util/api";
+import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const baseAccountUrl = "https://api.guildwars2.com/v2/account"
-const accountCharacterUrl = "https://api.guildwars2.com/v2/characters"
-const inventory = "/inventory" // shared inventory
-const bank = "/bank"
-const materials = "/materials"
-const wallet = "/wallet"
+const baseAccountUrl = "https://api.guildwars2.com/v2/account";
+const accountCharacterUrl = "https://api.guildwars2.com/v2/characters";
+const inventory = "/inventory"; // shared inventory
+const bank = "/bank";
+const materials = "/materials";
+const wallet = "/wallet";
 
 
-const ACCOUNT_INFO = "account_info"
-const ACCOUNT_BANK = "account_bank"
-const ACCOUNT_MATERIAL = "account_material"
-const ACCOUNT_SHARED_INVENTORY = "account_shared_inventory"
-const ACCOUNT_WALLET = "account_wallet"
-const ACCOUNT_CHARACTERS = "account_characters"
+const ACCOUNT_INFO = "account_info";
+const ACCOUNT_BANK = "account_bank";
+const ACCOUNT_MATERIAL = "account_material";
+const ACCOUNT_SHARED_INVENTORY = "account_shared_inventory";
+const ACCOUNT_WALLET = "account_wallet";
+const ACCOUNT_CHARACTERS = "account_characters";
 
 /**
  * Gets general details relating to the account
@@ -33,13 +33,13 @@ const ACCOUNT_CHARACTERS = "account_characters"
 export const getAccountInfo = async (req: any): Promise<any> => {
   const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountInfo = await fetch(baseAccountUrl, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountInfo, null, 4);
 
-  await writeToFile("./data", ACCOUNT_INFO + ".json", data)
+  await writeToFile("./data", ACCOUNT_INFO + ".json", data);
 
-  return accountInfo
+  return accountInfo;
 }
 
 /**
@@ -51,15 +51,15 @@ export const getAccountInfo = async (req: any): Promise<any> => {
  * @returns 
  */
 export const getAccountBank = async (req: any): Promise<any> => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountBank = await fetch(baseAccountUrl + bank, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountBank, null, 4);
 
-  await writeToFile("./data", ACCOUNT_BANK + ".json", data)
+  await writeToFile("./data", ACCOUNT_BANK + ".json", data);
 
-  return accountBank
+  return accountBank;
 }
 
 /**
@@ -71,14 +71,14 @@ export const getAccountBank = async (req: any): Promise<any> => {
  * @returns 
  */
 export const getAccountSharedInventory = async (req: any): Promise<any> => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountSharedInventory = await fetch(baseAccountUrl + inventory, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountSharedInventory, null, 4);
 
-  await writeToFile("./data", ACCOUNT_SHARED_INVENTORY + ".json", data)
-  return accountSharedInventory
+  await writeToFile("./data", ACCOUNT_SHARED_INVENTORY + ".json", data);
+  return accountSharedInventory;
 }
 
 /**
@@ -90,14 +90,14 @@ export const getAccountSharedInventory = async (req: any): Promise<any> => {
  * @returns 
  */
 export const getAccountMaterials = async (req: any): Promise<any> => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountMaterials = await fetch(baseAccountUrl + materials, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountMaterials, null, 4);
 
-  await writeToFile("./data", ACCOUNT_MATERIAL + ".json", data)
-  return accountMaterials
+  await writeToFile("./data", ACCOUNT_MATERIAL + ".json", data);
+  return accountMaterials;
 }
 
 /**
@@ -109,15 +109,15 @@ export const getAccountMaterials = async (req: any): Promise<any> => {
  * @returns json of wallet
  */
 export const getAccountWallet = async (req: any): Promise<any> => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountWallet = await fetch(baseAccountUrl + wallet, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountWallet, null, 4);
 
-  await writeToFile("./data", ACCOUNT_WALLET + ".json", data)
+  await writeToFile("./data", ACCOUNT_WALLET + ".json", data);
 
-  return accountWallet
+  return accountWallet;
 }
 
 /**
@@ -129,15 +129,15 @@ export const getAccountWallet = async (req: any): Promise<any> => {
  * @returns array of characters on the account
  */
 export const getAccountCharacters = async (req: any): Promise<any> => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   const accountCharacters = await fetch(accountCharacterUrl, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountCharacters, null, 4);
 
-  await writeToFile("./data", ACCOUNT_CHARACTERS + ".json", data)
+  await writeToFile("./data", ACCOUNT_CHARACTERS + ".json", data);
 
-  return accountCharacters
+  return accountCharacters;
 }
 
 /**
@@ -149,18 +149,18 @@ export const getAccountCharacters = async (req: any): Promise<any> => {
  * @param characters array of characters
  */
 export const getCharacterInventory = async (req: any, characters: string[]) => {
-  const { key } = req.query
+  const { key } = req.query;
 
-  const reqDetails = createReqDetails(key)
+  const reqDetails = createReqDetails(key);
   let characterInventory: any, characterUrl: string | URL | Request, data: string;
 
   for (const character of characters) {
     characterUrl = `${accountCharacterUrl}/${character}${inventory}`;
-    console.log(characterUrl)
+    console.log(characterUrl);
     characterInventory = await fetch(characterUrl, reqDetails).then((response) => response.json());
     data = JSON.stringify(characterInventory, null, 4);
 
-    console.log(characterInventory)
+    console.log(characterInventory);
 
     await writeToFile("./data/characters", character + ".json", data);
   }
@@ -185,11 +185,11 @@ export const getAccountCache = async (req: any): Promise<any> => {
     const filePath: string = path.join(__dirname, '..', 'data', file + ".json");
 
     try {
-    const data = fs.readFileSync(filePath, "utf-8")
-    const jsonData = JSON.parse(data)
-    results[file] = jsonData
+    const data = fs.readFileSync(filePath, "utf-8");
+    const jsonData = JSON.parse(data);
+    results[file] = jsonData;
     } catch (err) {
-      results[file] = {}
+      results[file] = {};
     }
   }
 
@@ -197,7 +197,9 @@ export const getAccountCache = async (req: any): Promise<any> => {
 }
 
 export const cleanAccountCache = (info: any) => {
-
+  const name = info.account_info.name;
+  const age = info.account_info.age;
+  const characters = info.account_characters;
   const wallet = info.account_wallet;
   let coin = 0;
   for (const item in wallet) {
@@ -208,9 +210,9 @@ export const cleanAccountCache = (info: any) => {
   }
 
   return {
-    name: info.account_info.name,
-    age: info.account_info.age,
-    characters: info.account_characters,
-    coin: coin
+    name,
+    age,
+    characters,
+    coin,
   }
 }

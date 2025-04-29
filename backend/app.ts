@@ -7,7 +7,7 @@ import createError from 'http-errors';
 
 import indexRouter from './routes/index.route';
 import accRouter from './routes/acc.route';
-import itemsRouter from './routes/items.route';
+import utilRouter from './routes/util.route';
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.use(express.static('public'));
 
 app.use('/', indexRouter);
 app.use('/acc', accRouter);
-app.use('/items', itemsRouter);
+app.use('/util', utilRouter);
 
 
 // catch 404 and forward to error handler

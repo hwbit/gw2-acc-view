@@ -11,5 +11,5 @@ export const mockService = async (req: any): Promise<any> => {
     }, 5000); // 5000 milliseconds = 5 seconds
   });
 
-  return result
+  return result;
 }

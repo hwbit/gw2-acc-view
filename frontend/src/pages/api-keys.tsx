@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ApiResponse {
   // Define this based on the real API structure
@@ -7,7 +7,7 @@ interface ApiResponse {
 }
 
 function InputApiKey() {
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(() => { return localStorage.getItem('userApiKey') || '' });
   const [apiResult, setApiResult] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ function InputApiKey() {
 
     try {
       const response = await fetch(`http://localhost:4001/acc/update?key=${inputValue}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -43,31 +43,44 @@ function InputApiKey() {
     }
   };
 
+  useEffect(() => {
+    localStorage.setItem('userApiKey', inputValue);
+  }, [inputValue])
+
   return (
     <>
-    <div style={{ padding: '20px' }}>
-      <h1>Insert GW API Key</h1>
-      <div>
-        Placeholder text
-      </div>
-      <input 
-        type="text" 
-        value={inputValue} 
-        onChange={handleInputChange} 
-        placeholder="Enter your GW2 API Key..." 
-      />
-      <button onClick={handleSubmit} style={{ marginLeft: '10px' }}>
-        Submit
-      </button>
+      <div style={{ padding: '20px' }}>
+        <h1>GW2 API Key</h1>
 
-      <div style={{ marginTop: '20px' }}>
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {apiResult && (
-          <pre>{JSON.stringify(apiResult, null, 2)}</pre>
-        )}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Enter your GW2 API Key..."
+        />
+        <button onClick={handleSubmit}>
+          Submit
+        </button>
+
+        <div>
+          <h2>Instructions:</h2>
+          <ol>
+            <li>Open the <a href="https://account.arena.net/applications">official Guild Wars 2 API Key Management.</a></li>
+            <li>Click on the "New Key" button.</li>
+            <li>Enter a name of your choice and check all permission checkboxes.</li>
+            <li>Copy your new API key.</li>
+            <li>Paste it in the form above.</li>
+          </ol>
+        </div>
+
+        <div style={{ marginTop: '20px' }}>
+          {loading && <p>Loading...</p>}
+          {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+          {apiResult && (
+            <pre>{JSON.stringify(apiResult, null, 2)}</pre>
+          )}
+        </div>
       </div>
-    </div>
 
     </>
   );
