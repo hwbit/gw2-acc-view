@@ -2,20 +2,27 @@ import { writeToFile } from "../util/fileWrite";
 import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const currenciesUrl = "https://api.guildwars2.com/v2/currencies?ids=all";
+const CURRENCIES_URL = "https://api.guildwars2.com/v2/currencies?ids=all";
+const TOKENINFO_URL = "https://api.guildwars2.com/v2/tokeninfo";
 
 const CURRENCIES = "currencies";
 const ACCOUNT_WALLET = "account_wallet";
 
+export const confirmToken = async (req: any): Promise<any> => {
+  const { key } = req.query;
+
+  const reqDetails = createReqDetails(key);
+  const tokenResults = await fetch(TOKENINFO_URL, reqDetails).then((response) => response.json());
+  
+  return !('text' in tokenResults);
+}
 
 export const getCurrencies = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const currenciesInfo = await fetch(currenciesUrl, reqDetails).then((response) => response.json());
+  const currenciesInfo = await fetch(CURRENCIES_URL, reqDetails).then((response) => response.json());
   const data = JSON.stringify(currenciesInfo, null, 4);
 
   await writeToFile("./data", CURRENCIES + ".json", data);

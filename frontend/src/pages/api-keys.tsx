@@ -8,6 +8,7 @@ interface ApiResponse {
 
 function InputApiKey() {
   const [inputValue, setInputValue] = useState<string>(() => { return localStorage.getItem('userApiKey') || '' });
+  const [hasStoredValue, setHasStoredValue] = useState<boolean>(false);
   const [apiResult, setApiResult] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,9 @@ function InputApiKey() {
       }
 
       const data: ApiResponse = await response.json();
+      if (!("message" in data)) {
+        localStorage.setItem('userApiKey', inputValue);
+      } 
       setApiResult(data);
 
     } catch (err) {
@@ -43,8 +47,17 @@ function InputApiKey() {
     }
   };
 
+  const handleClear = () => {
+    localStorage.removeItem('userApiKey');
+    setInputValue('');
+    setHasStoredValue(false);
+  };
+
   useEffect(() => {
-    localStorage.setItem('userApiKey', inputValue);
+    const key = localStorage.getItem('userApiKey');
+    if (key != undefined) {
+      setHasStoredValue(true);
+    }
   }, [inputValue])
 
   return (
@@ -61,6 +74,12 @@ function InputApiKey() {
         <button onClick={handleSubmit}>
           Submit
         </button>
+
+        {hasStoredValue && (
+          <button onClick={handleClear} style={{ marginLeft: '10px' }}>
+            Forget API Key
+          </button>
+        )}
 
         <div>
           <h2>Instructions:</h2>
