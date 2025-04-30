@@ -4,7 +4,9 @@ import convertSeconds from '../utilities/convert-seconds';
 import ConvertCoin from '../utilities/convert-coin';
 
 function Account() {
-    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [showDetails, setShowDetails] = useState<boolean>(false);
+    const [apiKey, setApiKey] = useState("");
+    const [hasStoredValue, setHasStoredValue] = useState<boolean>(false);
     const [accountName, setAccountName] = useState("No Account Loaded");
     const [accountAge, setAccountAge] = useState("0");
     const [accountCoin, setaccountCoin] = useState({
@@ -13,21 +15,36 @@ function Account() {
         copper: 0,
     })
 
-    useEffect(() => {
-        const getAcc = async () => {
-            const req = {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            };
-            const data = await fetch('http://localhost:4001/acc', req).then((response) => response.json());
-            console.log(data)
+    const getAcc = async () => {
+        const req = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        };
+        const data = await fetch('http://localhost:4001/acc', req).then((response) => response.json());
+        console.log(data)
 
-            if ("name" in data) {
-                setShowMessage(true);
-                setAccountName(data.name);
-                setAccountAge(convertSeconds(data.age));
-                setaccountCoin(ConvertCoin(data.coin));
-            }
+        if ("name" in data) {
+            setShowDetails(true);
+            setAccountName(data.name);
+            setAccountAge(convertSeconds(data.age));
+            setaccountCoin(ConvertCoin(data.coin));
+        }
+    }
+
+    const updateAccount = async () => {
+        const req = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        };
+        await fetch(`http://localhost:4001/acc/update?key=${apiKey}`, req).then((response) => response.json());
+        getAcc();
+    };
+
+    useEffect(() => {
+        const key = localStorage.getItem('userApiKey');
+        if (key != undefined) {
+            setHasStoredValue(true);
+            setApiKey(key);
         }
         getAcc();
     }, []);
@@ -36,7 +53,14 @@ function Account() {
         <>
             <h1>{accountName}</h1>
             <div>
-                {showMessage ?
+                {hasStoredValue &&
+                    (<p>
+                        <button onClick={updateAccount}>
+                            Refresh
+                        </button>
+                    </p>)
+                }
+                {showDetails ?
                     (
                         <ul>
                             <li>Age: {accountAge}</li>
@@ -46,11 +70,11 @@ function Account() {
                     :
                     (
                         <div>
-                            <p>Enter <a href="/api-keys">API key</a> to show account details.</p>                      
+                            <p>Enter <a href="/api-keys">API key</a> to show account details.</p>
                         </div>
                     )
                 }
-                 
+
             </div>
 
         </>
