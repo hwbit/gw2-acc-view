@@ -9,6 +9,14 @@ const TOKENINFO_URL = "https://api.guildwars2.com/v2/tokeninfo";
 const CURRENCIES = "currencies";
 const ACCOUNT_WALLET = "account_wallet";
 
+/**
+ * Checks input is a valide API token.
+ * 
+ * Calls API:2/tokeninfo
+ * 
+ * @param req 
+ * @returns 
+ */
 export const confirmToken = async (req: any): Promise<any> => {
   const { key } = req.query;
 
@@ -18,6 +26,14 @@ export const confirmToken = async (req: any): Promise<any> => {
   return !('text' in tokenResults);
 }
 
+/**
+ * Gets all the currencies in the game.
+ * 
+ * Calls API:2/currencies
+ * 
+ * @param req 
+ * @returns 
+ */
 export const getCurrencies = async (req: any): Promise<any> => {
   const { key } = req.query;
 
@@ -30,6 +46,13 @@ export const getCurrencies = async (req: any): Promise<any> => {
   return currenciesInfo;
 }
 
+
+/**
+ * Maps wallet currencies with general currencies info. Combines to give context to values in the wallet.
+ * 
+ * @param req 
+ * @returns 
+ */
 export const mapCurrencies = async (req: any) => {
 
   const account_wallet = fs.readFileSync("./data/"+ACCOUNT_WALLET+".json", "utf-8");

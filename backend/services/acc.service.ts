@@ -196,6 +196,12 @@ export const getAccountCache = async (req: any): Promise<any> => {
   return results;
 }
 
+/**
+ * Construct a response for the user account details stored locally.
+ * 
+ * @param info 
+ * @returns 
+ */
 export const cleanAccountCache = (info: any) => {
   const name = info.account_info.name;
   const age = info.account_info.age;
