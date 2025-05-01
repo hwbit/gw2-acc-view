@@ -1,26 +1,10 @@
-
-
 import { writeToFile } from "../util/fileWrite";
 import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-const baseAccountUrl = "https://api.guildwars2.com/v2/account";
-const accountCharacterUrl = "https://api.guildwars2.com/v2/characters";
-const inventory = "/inventory"; // shared inventory
-const bank = "/bank";
-const materials = "/materials";
-const wallet = "/wallet";
-
-
-const ACCOUNT_INFO = "account_info";
-const ACCOUNT_BANK = "account_bank";
-const ACCOUNT_MATERIAL = "account_material";
-const ACCOUNT_SHARED_INVENTORY = "account_shared_inventory";
-const ACCOUNT_WALLET = "account_wallet";
-const ACCOUNT_CHARACTERS = "account_characters";
+import { BASE_ACCOUNT_URL, ACCOUNT_CHARACTER_URL, inventory, bank, materials, wallet, ACCOUNT_INFO, ACCOUNT_BANK, ACCOUNT_MATERIAL, ACCOUNT_SHARED_INVENTORY, ACCOUNT_WALLET, ACCOUNT_CHARACTERS, WALLET_CURRENCIES } from "../util/constants";
 
 /**
  * Gets general details relating to the account
@@ -34,7 +18,7 @@ export const getAccountInfo = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountInfo = await fetch(baseAccountUrl, reqDetails).then((response) => response.json());
+  const accountInfo = await fetch(BASE_ACCOUNT_URL, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountInfo, null, 4);
 
   await writeToFile("./data", ACCOUNT_INFO + ".json", data);
@@ -54,7 +38,7 @@ export const getAccountBank = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountBank = await fetch(baseAccountUrl + bank, reqDetails).then((response) => response.json());
+  const accountBank = await fetch(BASE_ACCOUNT_URL + bank, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountBank, null, 4);
 
   await writeToFile("./data", ACCOUNT_BANK + ".json", data);
@@ -74,7 +58,7 @@ export const getAccountSharedInventory = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountSharedInventory = await fetch(baseAccountUrl + inventory, reqDetails).then((response) => response.json());
+  const accountSharedInventory = await fetch(BASE_ACCOUNT_URL + inventory, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountSharedInventory, null, 4);
 
   await writeToFile("./data", ACCOUNT_SHARED_INVENTORY + ".json", data);
@@ -93,7 +77,7 @@ export const getAccountMaterials = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountMaterials = await fetch(baseAccountUrl + materials, reqDetails).then((response) => response.json());
+  const accountMaterials = await fetch(BASE_ACCOUNT_URL + materials, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountMaterials, null, 4);
 
   await writeToFile("./data", ACCOUNT_MATERIAL + ".json", data);
@@ -112,7 +96,7 @@ export const getAccountWallet = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountWallet = await fetch(baseAccountUrl + wallet, reqDetails).then((response) => response.json());
+  const accountWallet = await fetch(BASE_ACCOUNT_URL + wallet, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountWallet, null, 4);
 
   await writeToFile("./data", ACCOUNT_WALLET + ".json", data);
@@ -132,7 +116,7 @@ export const getAccountCharacters = async (req: any): Promise<any> => {
   const { key } = req.query;
 
   const reqDetails = createReqDetails(key);
-  const accountCharacters = await fetch(accountCharacterUrl, reqDetails).then((response) => response.json());
+  const accountCharacters = await fetch(ACCOUNT_CHARACTER_URL, reqDetails).then((response) => response.json());
   const data = JSON.stringify(accountCharacters, null, 4);
 
   await writeToFile("./data", ACCOUNT_CHARACTERS + ".json", data);
@@ -155,7 +139,7 @@ export const getCharacterInventory = async (req: any, characters: string[]) => {
   let characterInventory: any, characterUrl: string | URL | Request, data: string;
 
   for (const character of characters) {
-    characterUrl = `${accountCharacterUrl}/${character}${inventory}`;
+    characterUrl = `${ACCOUNT_CHARACTER_URL}/${character}${inventory}`;
     console.log(characterUrl);
     characterInventory = await fetch(characterUrl, reqDetails).then((response) => response.json());
     data = JSON.stringify(characterInventory, null, 4);
@@ -178,7 +162,7 @@ export const getAccountCache = async (req: any): Promise<any> => {
   const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
   const __dirname = path.dirname(__filename); // get the name of the directory
 
-  const files = [ACCOUNT_INFO, ACCOUNT_WALLET, ACCOUNT_CHARACTERS, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL];
+  const files = [ACCOUNT_INFO, ACCOUNT_CHARACTERS, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL, WALLET_CURRENCIES];
   const results: Record<string, any> = {};
 
   for (const file of files) {
@@ -206,12 +190,20 @@ export const cleanAccountCache = (info: any) => {
   const name = info.account_info.name;
   const age = info.account_info.age;
   const characters = info.account_characters;
-  const wallet = info.account_wallet;
+  const wallet = info.wallet_currencies;
+  const account_bank = info.account_bank;
+  const account_shared_inventory = info.account_shared_inventory;
+  const account_material = info.account_material;
   let coin = 0;
+  let karma = 0;
+  
   for (const item in wallet) {
-    if (wallet[item].id == 1) {
-      coin = wallet[item].value;
-      break;
+    const value = wallet[item].value;
+    if ("Coin" == wallet[item].name) {
+      coin = value;
+    }
+    if ("Karma" == wallet[item].name) {
+      karma = value;
     }
   }
 
@@ -220,5 +212,9 @@ export const cleanAccountCache = (info: any) => {
     age,
     characters,
     coin,
+    karma,
+    account_bank,
+    account_shared_inventory,
+    account_material
   }
 }

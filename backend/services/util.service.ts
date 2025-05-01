@@ -3,11 +3,7 @@ import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
 
-const CURRENCIES_URL = "https://api.guildwars2.com/v2/currencies?ids=all";
-const TOKENINFO_URL = "https://api.guildwars2.com/v2/tokeninfo";
-
-const CURRENCIES = "currencies";
-const ACCOUNT_WALLET = "account_wallet";
+import { CURRENCIES_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_MATERIAL } from "../util/constants";
 
 /**
  * Checks input is a valide API token.
@@ -22,7 +18,7 @@ export const confirmToken = async (req: any): Promise<any> => {
 
   const reqDetails = createReqDetails(key);
   const tokenResults = await fetch(TOKENINFO_URL, reqDetails).then((response) => response.json());
-  
+
   return !('text' in tokenResults);
 }
 
@@ -54,26 +50,38 @@ export const getCurrencies = async (req: any): Promise<any> => {
  * @returns 
  */
 export const mapCurrencies = async (req: any) => {
-
-  const account_wallet = fs.readFileSync("./data/"+ACCOUNT_WALLET+".json", "utf-8");
+  const account_wallet = fs.readFileSync("./data/" + ACCOUNT_WALLET + ".json", "utf-8");
   const wallet_arr = JSON.parse(account_wallet);
 
-  const currencies = fs.readFileSync("./data/"+CURRENCIES+".json", "utf-8");
+  const currencies = fs.readFileSync("./data/" + CURRENCIES + ".json", "utf-8");
   const currencies_arr = JSON.parse(currencies);
 
-  // map for fast lookup
-  const map2 = new Map(wallet_arr.map(obj => [obj.id, obj]));
+  const merged = {}
 
-  // filter and merge
-  const merged = currencies_arr
-    .filter(obj => map2.has(obj.id))
-    .map(obj => ({
-      ...obj,
-      ...map2.get(obj.id)!
-    }));
+  for (const item in wallet_arr) {
+    const id = wallet_arr[item]["id"]
+    merged[id] = {}
+    merged[id]["value"] = wallet_arr[item]["value"]
+  }
 
+  for (const item in currencies_arr) {
+    const id = currencies_arr[item]["id"]
+    const name = currencies_arr[item]["name"]
+    if (id in merged) {
+      merged[id]["name"] = name
+    }
+  } 
 
-  await writeToFile("./data", "wallet_" + CURRENCIES + ".json", merged);
+  const data = JSON.stringify(merged, null, 4);
 
+  await writeToFile("./data", "wallet_" + CURRENCIES + ".json", data);
   return merged;
+}
+
+export const getItems = async (req: any) => {
+  const account_shared_inventory = fs.readFileSync("./data/" + ACCOUNT_MATERIAL + ".json", "utf-8");
+  const shared_inventory_json = JSON.parse(account_shared_inventory);
+
+  
+  return ""
 }

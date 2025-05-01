@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getAccountBank, getAccountCache, cleanAccountCache, getAccountCharacters, getAccountInfo, getAccountMaterials, getAccountSharedInventory, getAccountWallet, getCharacterInventory } from '../services/acc.service';
-import { confirmToken, getCurrencies } from '../services/util.service';
+import { confirmToken, getCurrencies, mapCurrencies } from '../services/util.service';
 
 export const all = async (req: Request, res: Response) => {
   try {
@@ -28,6 +28,7 @@ export const update = async (req: Request, res: Response) => {
       // const characterInventory = await getCharacterInventory(req, accountCharacters);
 
       const currencies = await getCurrencies(req);
+      const mappedCurrencies = mapCurrencies(req);
 
       const info = await getAccountCache(req);
       curatedInfo = cleanAccountCache(info);
