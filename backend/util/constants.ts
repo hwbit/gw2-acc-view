@@ -2,6 +2,7 @@ export const TOKENINFO_URL = "https://api.guildwars2.com/v2/tokeninfo";
 export const BASE_ACCOUNT_URL = "https://api.guildwars2.com/v2/account";
 export const ACCOUNT_CHARACTER_URL = "https://api.guildwars2.com/v2/characters";
 export const CURRENCIES_URL = "https://api.guildwars2.com/v2/currencies?ids=all";
+export const ITEMS_URL = "https://api.guildwars2.com/v2/items?ids=";
 
 export const inventory = "/inventory"; // shared inventory
 export const bank = "/bank";
@@ -17,3 +18,4 @@ export const ACCOUNT_WALLET = "account_wallet";
 export const CURRENCIES = "currencies";
 export const WALLET_CURRENCIES = "wallet_currencies"; // combination of wallet and currencies
 
+export const MAX_ITEM_QUERY_SIZE = 100;

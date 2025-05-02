@@ -3,7 +3,7 @@ import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
 
-import { CURRENCIES_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_MATERIAL } from "../util/constants";
+import { CURRENCIES_URL, ITEMS_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL, MAX_ITEM_QUERY_SIZE } from "../util/constants";
 
 /**
  * Checks input is a valide API token.
@@ -21,6 +21,7 @@ export const confirmToken = async (req: any): Promise<any> => {
 
   return !('text' in tokenResults);
 }
+
 
 /**
  * Gets all the currencies in the game.
@@ -50,27 +51,29 @@ export const getCurrencies = async (req: any): Promise<any> => {
  * @returns 
  */
 export const mapCurrencies = async (req: any) => {
-  const account_wallet = fs.readFileSync("./data/" + ACCOUNT_WALLET + ".json", "utf-8");
-  const wallet_arr = JSON.parse(account_wallet);
+  const accountWallet = fs.readFileSync("./data/" + ACCOUNT_WALLET + ".json", "utf-8");
+  const walletArr = JSON.parse(accountWallet);
 
   const currencies = fs.readFileSync("./data/" + CURRENCIES + ".json", "utf-8");
-  const currencies_arr = JSON.parse(currencies);
+  const currenciesArr = JSON.parse(currencies);
 
-  const merged = {}
+  const merged = {};
 
-  for (const item in wallet_arr) {
-    const id = wallet_arr[item]["id"]
-    merged[id] = {}
-    merged[id]["value"] = wallet_arr[item]["value"]
+  for (const item in walletArr) {
+    const id = walletArr[item]["id"];
+    merged[id] = {};
+    merged[id]["value"] = walletArr[item]["value"];
   }
 
-  for (const item in currencies_arr) {
-    const id = currencies_arr[item]["id"]
-    const name = currencies_arr[item]["name"]
+  for (const item in currenciesArr) {
+    const id = currenciesArr[item]["id"];
+    const name = currenciesArr[item]["name"];
+    const icon = currenciesArr[item]["icon"];
     if (id in merged) {
-      merged[id]["name"] = name
+      merged[id]["name"] = name;
+      merged[id]["icon"] = icon;
     }
-  } 
+  }
 
   const data = JSON.stringify(merged, null, 4);
 
@@ -78,10 +81,113 @@ export const mapCurrencies = async (req: any) => {
   return merged;
 }
 
-export const getItems = async (req: any) => {
-  const account_shared_inventory = fs.readFileSync("./data/" + ACCOUNT_MATERIAL + ".json", "utf-8");
-  const shared_inventory_json = JSON.parse(account_shared_inventory);
+// Item helpers
 
-  
+const getMaterial = async (req: any): Promise<any[]> => {
+  const accountMaterials = fs.readFileSync("./data/" + ACCOUNT_MATERIAL + ".json", "utf-8");
+  const accountMaterialsJson = JSON.parse(accountMaterials);
+  const materialArray: any[] = []; // holds material list
+  let materialList: number[] = [];
+
+  // get the ids and break the list up into smaller pieces
+  for (const index in accountMaterialsJson) {
+    const numberIndex = Number(index);
+    const id = accountMaterialsJson[index]["id"];
+    materialList.push(id);
+
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length) {
+      materialArray.push(materialList);
+      materialList = [];
+    }
+  }
+
+  let materialResults: any[] = [];
+  // call the api to get the list
+  for (const index in materialArray) {
+    const parameters = materialArray[index].join(",");
+    const url = ITEMS_URL + parameters;
+    const materialResponse = await fetch(url).then((response) => response.json());
+    materialResults = materialResults.concat(materialResponse);
+  }
+
+  return materialResults;
+}
+
+
+const getSharedInventory = async (req: any): Promise<any[]> => {
+  const accountSharedInventory = fs.readFileSync("./data/" + ACCOUNT_SHARED_INVENTORY + ".json", "utf-8");
+  const accountSharedInventoryJson = JSON.parse(accountSharedInventory);
+  const sharedInventoryList: any[] = [];
+
+  // get the ids
+  for (const index in accountSharedInventoryJson) {
+    const item = accountSharedInventoryJson[index];
+    if (item) {
+      const id = item["id"];
+      sharedInventoryList.push(id);
+    }
+  }
+
+  // call the api to get the list
+  // Note: shared inventory is a small list - no need to break it item smaller pieces
+  const parameters = sharedInventoryList.join(",");
+  const url = ITEMS_URL + parameters;
+  const sharedInventoryResponse = await fetch(url).then((response) => response.json());
+
+  return sharedInventoryResponse;
+}
+
+
+const getBank = async (req: any): Promise<any[]> => {
+  const accountBank = fs.readFileSync("./data/" + ACCOUNT_BANK + ".json", "utf-8");
+  const accountBankJson = JSON.parse(accountBank);
+  const accountBankArray: any[] = []; // holds material list
+  let accountBankList: number[] = [];
+
+  // get the ids and break the list up into smaller pieces
+  for (const index in accountBankJson) {
+    const numberIndex = Number(index); // cast item
+    const item = accountBankJson[index];
+    if (item) {
+      const id = item["id"];
+      accountBankList.push(id);
+    }
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountBankJson.length) {
+      accountBankArray.push(accountBankList);
+      accountBankList = [];
+    }
+  }
+
+  let accountBankResults: any[] = [];
+  // call the api to get the list
+  for (const index in accountBankArray) {
+    const parameters = accountBankArray[index].join(",");
+    const url = ITEMS_URL + parameters;
+    const accountBankResponse = await fetch(url).then((response) => response.json());
+    accountBankResults = accountBankResults.concat(accountBankResponse);
+  }
+
+  return accountBankResults;
+}
+
+
+export const getItems = async (req: any) => {
+  const materialList = await getMaterial(req);
+  const materialListString = JSON.stringify(materialList, null, 4);
+  await writeToFile("./data", "material_list.json", materialListString);
+
+  const sharedInventoryList = await getSharedInventory(req);
+  const sharedInventoryListString = JSON.stringify(sharedInventoryList, null, 4);
+  await writeToFile("./data", "shared_inventory_list.json", sharedInventoryListString);
+
+  const bankList = await getBank(req);
+  const bankListString = JSON.stringify(bankList, null, 4);
+  await writeToFile("./data", "bank_list.json", bankListString);
+
+  return ""
+}
+
+
+export const mapItems = async (req: any) => {
   return ""
 }
