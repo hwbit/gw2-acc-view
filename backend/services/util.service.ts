@@ -173,20 +173,23 @@ const getBank = async (req: any): Promise<any[]> => {
 
 export const getItems = async (req: any) => {
   const materialList = await getMaterial(req);
-  const materialListString = JSON.stringify(materialList, null, 4);
-  await writeToFile("./data", "material_list.json", materialListString);
-
   const sharedInventoryList = await getSharedInventory(req);
-  const sharedInventoryListString = JSON.stringify(sharedInventoryList, null, 4);
-  await writeToFile("./data", "shared_inventory_list.json", sharedInventoryListString);
-
   const bankList = await getBank(req);
-  const bankListString = JSON.stringify(bankList, null, 4);
-  await writeToFile("./data", "bank_list.json", bankListString);
 
-  return ""
+  await createItemCache(materialList);
+  await createItemCache(sharedInventoryList);
+  await createItemCache(bankList);
 }
 
+const createItemCache = async (data: object[]) => {
+  for (const index in data) {
+    const item = data[index];
+    const id = item["id"];
+    const itemString = JSON.stringify(item, null, 4);
+
+    await writeToFile("./data/items", `${id}.json`, itemString);
+  }
+}
 
 export const mapItems = async (req: any) => {
   return ""
