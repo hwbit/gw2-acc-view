@@ -1,8 +1,9 @@
+import fs from 'fs';
+import path from 'path';
+
 import { writeToFile } from "../util/fileWrite";
 import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
 import { fileURLToPath } from 'url';
 import { BASE_ACCOUNT_URL, ACCOUNT_CHARACTER_URL, inventory, bank, materials, wallet, ACCOUNT_INFO, ACCOUNT_BANK, ACCOUNT_MATERIAL, ACCOUNT_SHARED_INVENTORY, ACCOUNT_WALLET, ACCOUNT_CHARACTERS, WALLET_CURRENCIES } from "../util/constants";
 

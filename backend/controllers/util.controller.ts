@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getCurrencies, mapCurrencies, getItems, mapItems } from '../services/util.service';
-
+import { getCurrencies, getItems, mapCurrencies, mapItems } from '../services/util.service';
+import { createDataFolders } from '../util/createDataFolders';
 
 export const all = async (req: Request, res: Response) => {
   try {
@@ -27,6 +27,7 @@ export const currencies = async (req: Request, res: Response) => {
 
 export const items = async (req: Request, res: Response) => {
   try {
+    await createDataFolders()
     const info = getItems(req);
     // mapItems(req);
 

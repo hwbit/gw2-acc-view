@@ -1,6 +1,19 @@
+
 import { Request, Response } from 'express';
-import { getAccountBank, getAccountCache, cleanAccountCache, getAccountCharacters, getAccountInfo, getAccountMaterials, getAccountSharedInventory, getAccountWallet, getCharacterInventory } from '../services/acc.service';
+import {
+  cleanAccountCache,
+  getAccountBank,
+  getAccountCache,
+  getAccountCharacters,
+  getAccountInfo,
+  getAccountMaterials,
+  getAccountSharedInventory,
+  getAccountWallet,
+  getCharacterInventory
+} from '../services/acc.service';
 import { confirmToken, getCurrencies, mapCurrencies } from '../services/util.service';
+import { createDataFolders } from "../util/createDataFolders";
+import fs from 'fs';
 
 export const all = async (req: Request, res: Response) => {
   try {
@@ -19,6 +32,7 @@ export const update = async (req: Request, res: Response) => {
     let curatedInfo = {};
     const validToken = await confirmToken(req);
     if (validToken) {
+      await createDataFolders();
       const accountInfo = await getAccountInfo(req);
       const accountBank = await getAccountBank(req);
       const accountMaterials = await getAccountMaterials(req);
@@ -33,7 +47,7 @@ export const update = async (req: Request, res: Response) => {
       const info = await getAccountCache(req);
       curatedInfo = cleanAccountCache(info);
     } else {
-      curatedInfo = {message: "Invalid API Key"};
+      curatedInfo = { message: "Invalid API Key" };
     }
     return res.status(200).send(curatedInfo);
   } catch (error) {
