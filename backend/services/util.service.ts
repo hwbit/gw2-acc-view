@@ -95,7 +95,8 @@ const getMaterial = async (req: any): Promise<any[]> => {
     const id = accountMaterialsJson[index]["id"];
     materialList.push(id);
 
-    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length) {
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length-1) {
+      console.log(materialList)
       materialArray.push(materialList);
       materialList = [];
     }
@@ -152,7 +153,7 @@ const getBank = async (req: any): Promise<any[]> => {
       const id = item["id"];
       accountBankList.push(id);
     }
-    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountBankJson.length) {
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountBankJson.length-1) {
       accountBankArray.push(accountBankList);
       accountBankList = [];
     }
