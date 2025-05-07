@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { all, currencies, items } from '../controllers/util.controller'
+import { all, currencies, items, updateItems } from '../controllers/util.controller'
 
 const router = express.Router()
 
@@ -27,10 +27,21 @@ router.get('/currencies', async function (req, res, next) {
 }
 );
 
-
 router.get('/items', async function (req, res, next) {
   try {
     await items(req, res)
+
+    res.status(200);
+  } catch {
+    console.log("Error in util")
+  }
+}
+);
+
+
+router.get('/items/update', async function (req, res, next) {
+  try {
+    await updateItems(req, res)
 
     res.status(200);
   } catch {

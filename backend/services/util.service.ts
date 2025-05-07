@@ -3,7 +3,7 @@ import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
 
-import { CURRENCIES_URL, ITEMS_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL, MAX_ITEM_QUERY_SIZE } from "../util/constants";
+import { CURRENCIES_URL, ITEMS_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL, ALL_INVENTORY, MAX_ITEM_QUERY_SIZE } from "../util/constants";
 
 /**
  * Checks input is a valide API token.
@@ -171,7 +171,14 @@ const getBank = async (req: any): Promise<any[]> => {
 }
 
 
-export const getItems = async (req: any) => {
+export const getSharedItems = async (req: any) => {
+  const allInventory = fs.readFileSync("./data/" + ALL_INVENTORY + ".json", "utf-8");
+  const allInventoryJson = JSON.parse(allInventory);
+  return allInventoryJson;
+}
+
+
+export const updateSharedItems = async (req: any) => {
   const materialList = await getMaterial(req);
   const sharedInventoryList = await getSharedInventory(req);
   const bankList = await getBank(req);
@@ -179,18 +186,56 @@ export const getItems = async (req: any) => {
   await createItemCache(materialList);
   await createItemCache(sharedInventoryList);
   await createItemCache(bankList);
+
+  const mapBank = await mapItems(ACCOUNT_BANK);
+  const mapSharedInventory = await mapItems(ACCOUNT_SHARED_INVENTORY);
+  const mapMaterials = await mapItems(ACCOUNT_MATERIAL);
+
+  const allInventory = {
+    "account_bank": mapBank,
+    "shared_inventory": mapSharedInventory,
+    "materials": mapMaterials,
+  };
+  const allInventoryString = JSON.stringify(allInventory, null, 4);
+  await writeToFile("./data", "all_inventory.json", allInventoryString);
 }
+
 
 const createItemCache = async (data: object[]) => {
   for (const index in data) {
     const item = data[index];
     const id = item["id"];
     const itemString = JSON.stringify(item, null, 4);
-
-    await writeToFile("./data/items", `${id}.json`, itemString);
+    const filePath = `./data/items/${id}.json`
+    if (fs.existsSync(filePath)) {
+      await writeToFile("./data/items", `${id}.json`, itemString);
+    }
   }
 }
 
-export const mapItems = async (req: any) => {
-  return ""
+
+export const mapItems = async (data: string) => {
+  const items = fs.readFileSync("./data/" + data + ".json", "utf-8");
+  const itemsJson = JSON.parse(items);
+
+  for (const index in itemsJson) {
+    const item = itemsJson[index];
+    
+    if (item) {
+      const id = item["id"];
+      const filePath = `./data/items/${id}.json`;
+      let name = "ItemName"; // placeholder - some items may not be in the API
+      let icon = "NoIcon"; // placeholder
+      if (fs.existsSync(filePath)) {
+        const cachedItem = fs.readFileSync(filePath, "utf-8");
+        const cachedItemJson = JSON.parse(cachedItem)
+        name = cachedItemJson["name"];
+        icon = cachedItemJson["icon"];
+      }
+
+      item["name"] = name;
+      item["icon"] = icon;
+    }
+  }
+  return itemsJson;
 }

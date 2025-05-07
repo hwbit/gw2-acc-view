@@ -17,5 +17,6 @@ export const ACCOUNT_SHARED_INVENTORY = "account_shared_inventory";
 export const ACCOUNT_WALLET = "account_wallet";
 export const CURRENCIES = "currencies";
 export const WALLET_CURRENCIES = "wallet_currencies"; // combination of wallet and currencies
+export const ALL_INVENTORY ="all_inventory"
 
 export const MAX_ITEM_QUERY_SIZE = 100;
