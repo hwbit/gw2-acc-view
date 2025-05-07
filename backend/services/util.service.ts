@@ -96,7 +96,6 @@ const getMaterial = async (req: any): Promise<any[]> => {
     materialList.push(id);
 
     if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length-1) {
-      console.log(materialList)
       materialArray.push(materialList);
       materialList = [];
     }
@@ -208,7 +207,7 @@ const createItemCache = async (data: object[]) => {
     const id = item["id"];
     const itemString = JSON.stringify(item, null, 4);
     const filePath = `./data/items/${id}.json`
-    if (fs.existsSync(filePath)) {
+    if (!fs.existsSync(filePath)) {
       await writeToFile("./data/items", `${id}.json`, itemString);
     }
   }
