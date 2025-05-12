@@ -9,6 +9,9 @@ function NavBar() {
                         <a href="/account">Account</a>
                     </li>
                     <li>
+                        <a href="/inventory">Inventory</a>
+                    </li>
+                    <li>
                         <a href="/api-keys">Api Key</a>
                     </li>
                     <li>

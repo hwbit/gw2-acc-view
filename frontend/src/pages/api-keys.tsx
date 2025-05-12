@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
 
-interface ApiResponse {
-  // Define this based on the real API structure
-  message?: string;
-  [key: string]: unknown;
-}
-
 function InputApiKey() {
   const [inputValue, setInputValue] = useState<string>(() => { return localStorage.getItem('userApiKey') || '' });
   const [hasStoredValue, setHasStoredValue] = useState<boolean>(false);
-  const [apiResult, setApiResult] = useState<ApiResponse | null>(null);
+  const [apiResult, setApiResult] = useState<null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +23,7 @@ function InputApiKey() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
       if (!("message" in data)) {
         localStorage.setItem('userApiKey', inputValue);
       } 

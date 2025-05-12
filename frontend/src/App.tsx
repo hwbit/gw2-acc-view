@@ -5,6 +5,7 @@ import Home from "./pages/home";
 import Account from "./pages/account"
 import InputApiKey from "./pages/api-keys";
 import About from "./pages/about";
+import Inventory from "./pages/inventory";
 
 function App() {
   return (
@@ -20,6 +21,10 @@ function App() {
             <Route
               path={"account"}
               element={<Account />}
+            />
+            <Route
+              path={"inventory"}
+              element={<Inventory />}
             />
             <Route
               path={"api-keys"}
