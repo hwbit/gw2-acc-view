@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { updateSharedItems, mapCurrencies, getSharedItems } from '../services/util.service';
+import { updateSharedItems, mapCurrencies, getSharedItems, getCharacterItems } from '../services/util.service';
 import { createDataFolders } from '../util/createDataFolders';
 
 export const all = async (req: Request, res: Response) => {
@@ -28,7 +28,9 @@ export const currencies = async (req: Request, res: Response) => {
 
 export const items = async (req: Request, res: Response) => {
   try {
-    const info = await getSharedItems(req)
+    const info = await getSharedItems(req);
+    // const chars = await getCharacterItems();
+    // const results = {...info, ...chars};
 
     return res.status(200).send(info);
   } catch (error) {

@@ -2,6 +2,7 @@ import { writeToFile } from "../util/fileWrite";
 import { createReqDetails } from "../util/api";
 import { Request, Response } from 'express';
 import fs from 'fs';
+import path from 'path';
 
 import { CURRENCIES_URL, ITEMS_URL, TOKENINFO_URL, CURRENCIES, ACCOUNT_WALLET, ACCOUNT_BANK, ACCOUNT_SHARED_INVENTORY, ACCOUNT_MATERIAL, ALL_INVENTORY, MAX_ITEM_QUERY_SIZE } from "../util/constants";
 
@@ -95,7 +96,7 @@ const getMaterial = async (req: any): Promise<any[]> => {
     const id = accountMaterialsJson[index]["id"];
     materialList.push(id);
 
-    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length-1) {
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountMaterialsJson.length - 1) {
       materialArray.push(materialList);
       materialList = [];
     }
@@ -152,7 +153,7 @@ const getBank = async (req: any): Promise<any[]> => {
       const id = item["id"];
       accountBankList.push(id);
     }
-    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountBankJson.length-1) {
+    if (numberIndex % MAX_ITEM_QUERY_SIZE == 0 || numberIndex == accountBankJson.length - 1) {
       accountBankArray.push(accountBankList);
       accountBankList = [];
     }
@@ -175,6 +176,29 @@ export const getSharedItems = async (req: any) => {
   const allInventory = fs.readFileSync("./data/" + ALL_INVENTORY + ".json", "utf-8");
   const allInventoryJson = JSON.parse(allInventory);
   return allInventoryJson;
+}
+
+
+export const getCharacterItems = async () => {
+  const characters = {};
+  try {
+    const files = fs.readdirSync("./data/characters");
+
+    for (const file of files) {
+      const ext = path.extname(file);
+      const name = path.basename(file, ext);
+
+      if (ext === '.json') {
+        const fullPath = path.join("./data/characters", file);
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        characters[name] = JSON.parse(content);
+      }
+    }
+    return {"characters": characters};
+  } catch (err) {
+    console.error("Error reading directory:", err);
+    return {}
+  }
 }
 
 
@@ -220,7 +244,7 @@ export const mapItems = async (data: string) => {
 
   for (const index in itemsJson) {
     const item = itemsJson[index];
-    
+
     if (item) {
       const id = item["id"];
       const filePath = `./data/items/${id}.json`;
