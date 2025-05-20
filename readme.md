@@ -9,8 +9,8 @@ This application is still in very early development. Features and improvement wi
 - Guild Wars 2 API key
 
 # How to use
-1. `npm install`
-2. `npm start dev`
+1. Install packages: `npm install`
+2. Run application: `npm start dev`
 3. Access at [http://localhost:5173](http://localhost:5173)
 
 

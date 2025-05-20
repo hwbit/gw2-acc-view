@@ -12,7 +12,6 @@ import {
   getCharacterInventory
 } from '../services/acc.service';
 import { confirmToken, getCurrencies, mapCurrencies } from '../services/util.service';
-import { createDataFolders } from "../util/createDataFolders";
 import fs from 'fs';
 
 export const all = async (req: Request, res: Response) => {
@@ -32,7 +31,6 @@ export const update = async (req: Request, res: Response) => {
     let curatedInfo = {};
     const validToken = await confirmToken(req);
     if (validToken) {
-      await createDataFolders();
       const accountInfo = await getAccountInfo(req);
       const accountBank = await getAccountBank(req);
       const accountMaterials = await getAccountMaterials(req);

@@ -1,7 +1,7 @@
 import fs from "fs";
 
-export const createDataFolders = async () => {
-    const base = "./data";
+const createDataFolders = async () => {
+    const base = "backend/data";
     const folders = ['characters', 'items'].map(name => `${base}/${name}`);
 
     try {
@@ -14,3 +14,5 @@ export const createDataFolders = async () => {
         console.error('Error creating folders:', err);
     }
 }
+
+createDataFolders();

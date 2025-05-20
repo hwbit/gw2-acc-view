@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { updateSharedItems, mapCurrencies, getSharedItems, getCharacterItems } from '../services/util.service';
-import { createDataFolders } from '../util/createDataFolders';
 
 export const all = async (req: Request, res: Response) => {
   try {
@@ -42,7 +41,6 @@ export const items = async (req: Request, res: Response) => {
 
 export const updateItems = async (req: Request, res: Response) => {
   try {
-    await createDataFolders()
     const info = updateSharedItems(req);
 
     return res.status(200).send(info);
