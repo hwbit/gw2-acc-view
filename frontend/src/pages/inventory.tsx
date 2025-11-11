@@ -106,8 +106,9 @@ function Inventory() {
           ))}
         </div>
 
-        <h2>Shared Inventory</h2>
-        {/* {JSON.stringify(accountSharedInventory)} */}
+        {/* TODO - fix shared inv and mats (VoE release broke something)*/}
+
+        {/* <h2>Shared Inventory</h2>
         <div
           className="grid gap-2"
           style={{
@@ -158,10 +159,9 @@ function Inventory() {
               )}
             </div>
           ))}
-        </div>
+        </div> */}
 
-        <h2>Materials</h2>
-        {/* {JSON.stringify(accountMaterials)} */}
+        {/* <h2>Materials</h2>
 
         <div
           className="grid gap-2"
@@ -213,7 +213,7 @@ function Inventory() {
               )}
             </div>
           ))}
-        </div>
+        </div> */}
 
       </div >
     </>
